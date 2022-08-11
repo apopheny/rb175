@@ -1,12 +1,13 @@
 require 'socket'
 
-server = TCPServer.new('localhost', 3001)
+server = TCPServer.new('localhost', 3003)
 
 def parse_request(request_line)
   method = request_line.scan(/(^\w+)/)[0][0]
   path = request_line.scan(/GET\s(\/[^?\s]*)/)[0][0]
-  params = request_line.scan(/\?*(\w+)=(\d+)/).to_h
-
+  params = request_line.include?('?') ? \
+    request_line.scan(/\?*(\w+)=(\d+)/).to_h : ''
+  
   [method, path, params]
 end
 
@@ -26,13 +27,17 @@ loop do
   client.puts "<!DOCTYPE html>"
   client.puts "<html>"
   client.puts "<body>"
-  client.puts "<h1>Dice Roller</h1>"
-  client.puts "<p>Method: <strong>#{method}</strong></p><p>Path: <strong>#{path}</strong></p><p>Params: <strong>#{params}</strong></p>"
+  client.puts "<pre>"
   
-  rolls = params['rolls'].to_i
-  sides = params['sides'].to_i
-  1.upto(rolls) { |turn| client.puts "<p>Roll #{turn} is #{rand(sides) + 1}</p>" }
-  
+  client.puts "<h1>Counter</h1>"
+
+  number = params["number"].to_i
+
+  client.puts "<p>The current number is #{number}.</p>"
+  client.puts "<a href='?number=#{number + 1}'>Increment by 1</a> " \
+    "<a href='?number=#{number - 1}'>Decrement by 1</a>"
+
+  client.puts "</pre>"
   client.puts "</body>"
   client.puts "</html>"
   client.close
