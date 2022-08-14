@@ -1,0 +1,6 @@
+<% number = params[:number].to_i - 1 %>
+
+<h2 class="content-subhead">Chapter <%= params[:number] %>: <%= @contents[number] %>
+</h2>
+
+<%= in_paragraphs(@chapter) %>
